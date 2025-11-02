@@ -1,453 +1,236 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Nandini — Vibrant Flipbook</title>
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nandini’s Diary 💫</title>
+
 <style>
-  :root{
-    --bg:#fff3f0;
-    --paper:#fffaf8;
-    --accent1: #ff6b81;   /* vibrant pink */
-    --accent2: #ffb366;   /* warm orange */
-    --accent3: #6b9cff;   /* cool blue */
-    --muted:#5b5857;
-    --shadow: 0 30px 80px rgba(16,18,20,0.12);
-    --notebook-rule: rgba(0,0,0,0.03);
-    --page-radius: 12px;
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Crimson+Text&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Crimson Text', serif;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #333;
+  overflow-x: hidden;
+  min-height: 100vh;
+  padding-bottom: 50px;
+}
+
+header {
+  text-align: center;
+  color: white;
+  font-family: 'Dancing Script', cursive;
+  padding: 50px 20px 20px;
+  font-size: 2.5em;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Chapter Buttons Grid */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  padding: 40px 20px;
+}
+
+.chapter-btn {
+  background: #fefcf9;
+  border-left: 5px solid #ff4c4c;
+  border-radius: 8px;
+  padding: 25px;
+  cursor: pointer;
+  text-align: center;
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.6em;
+  color: #2575fc;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  background-image: repeating-linear-gradient(
+    #fefcf9,
+    #fefcf9 28px,
+    #c2dfff 29px
+  );
+}
+.chapter-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+/* Overlay Popup */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.popup {
+  background: repeating-linear-gradient(#fefcf9, #fefcf9 28px, #c2dfff 29px);
+  border-left: 5px solid #ff4c4c;
+  border-radius: 10px;
+  padding: 40px 30px;
+  width: 85%;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+  animation: fadeIn 0.4s ease;
+}
+
+.popup h2 {
+  font-family: 'Dancing Script', cursive;
+  font-size: 2em;
+  color: #2575fc;
+  margin-bottom: 15px;
+}
+
+.popup p {
+  font-size: 1.1em;
+  line-height: 1.9em;
+  text-align: justify;
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: #ff4c4c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.4em;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.close-btn:hover {
+  background: #ff2a2a;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: scale(0.95);}
+  to {opacity: 1; transform: scale(1);}
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  header {
+    font-size: 2em;
+  }
+  .chapter-btn {
+    font-size: 1.4em;
+    padding: 20px;
+  }
+  .popup {
+    padding: 25px 20px;
   }
 
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#fff3f0,#fffaf8);font-family:Poppins,system-ui,Arial;color:#1a1a1a;-webkit-font-smoothing:antialiased}
-  a{color:inherit;text-decoration:none}
-
-  /* Center stage */
-  .stage{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:28px;
-  }
-
-  /* Book container */
-  .book-wrap{
-    width:98%;
-    max-width:980px;
-    height:84vh;
-    perspective:2200px;
-    position:relative;
-  }
-
-  /* Stack of pages */
-  .pages{
-    width:100%;
-    height:100%;
-    position:relative;
-    margin:0 auto;
-  }
-
-  /* Each sheet styles */
-  .sheet{
-    position:absolute;
-    inset:0;
-    background:linear-gradient(180deg,var(--paper), #fff);
-    border-radius:var(--page-radius);
-    box-shadow:var(--shadow);
-    transform-origin:left center;
-    transition:transform .9s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
-    overflow:hidden;
-    display:flex;
-    flex-direction:row;
-  }
-
-  /* two columns: left/right page design (no images) */
-  .sheet .left, .sheet .right{
-    width:50%;
-    padding:28px;
-    min-height:100%;
-    box-sizing:border-box;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    gap:8px;
-  }
-
-  /* left decorative: colored header + ruled lines */
-  .left{
-    border-right:1px solid rgba(0,0,0,0.04);
-    background:
-      repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 28px,
-        var(--notebook-rule) 29px,
-        var(--notebook-rule) 30px
-      ),
-      linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0.6));
-    position:relative;
-  }
-  .left .label{
-    display:inline-block;padding:10px 14px;border-radius:10px;font-weight:700;color:white;
-    background:linear-gradient(90deg,var(--accent1),var(--accent2));
-    box-shadow:0 8px 24px rgba(255,107,129,0.12);
-    font-family: 'Playfair Display', serif;
-    font-size:18px;
-    margin-bottom:18px;
-  }
-  .left .note{
-    color:var(--muted);font-size:14px;line-height:1.6;white-space:pre-line;
-  }
-
-  /* right content page (main text) */
-  .right{
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,250,247,0.02));
-    padding-left:36px;
-  }
-  .right h2{
-    margin:0;font-family:'Great Vibes',cursive;font-size:36px;color:var(--accent1);
-  }
-  .right h3{font-family:'Playfair Display',serif;margin:6px 0 10px;color:var(--accent2)}
-  .right p{margin:8px 0;line-height:1.68;color:#222;font-size:15px;white-space:pre-line}
-  .right .meta{color:var(--muted);font-size:13px;margin-top:12px}
-
-  /* flipped state */
-  .sheet.flipped{
-    transform: rotateY(-180deg);
-    z-index:0;
-    box-shadow: 0 40px 120px rgba(10,10,12,0.12);
-  }
-
-  /* stacking order - will be applied by JS */
-  /* controls */
-  .controls{
-    position:absolute;
-    bottom:14px;
-    left:0;right:0;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 18px;
-    pointer-events:none;
-  }
-  .controls .group{pointer-events:all;display:flex;gap:10px}
-  .btn{
-    background:#fff;border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;box-shadow:0 8px 24px rgba(10,10,12,0.04);
-  }
-  .btn.primary{background:linear-gradient(90deg,var(--accent3),var(--accent1));color:#fff}
-  .page-ind{font-size:14px;color:var(--muted)}
-
-  /* covers (front/back) will be sheets too but styled */
-  .cover .left, .cover .right { align-items:center; justify-content:center; }
-  .cover .left .label, .cover .right h2 { font-size:26px }
-  .cover .right h2{ color:var(--accent3) }
-
-  /* responsive: mobile single page mode */
-  @media(max-width:700px){
-    .sheet { flex-direction:column; transform-origin:center center; border-radius:12px }
-    .sheet .left, .sheet .right { width:100%; padding:18px }
-    .left{ min-height:180px }
-    .right{ padding-left:18px }
-    /* flipped rotation should be vertical on mobile */
-    .sheet.flipped{ transform: rotateX(-180deg) }
-    .pages{height:100%}
-    .controls{bottom:10px;padding:0 12px}
-  }
-
-  /* little visual polish */
-  body::-webkit-scrollbar{display:none}
-  .page-edge {position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;background-image:linear-gradient(90deg, transparent, rgba(255,255,255,0.02) 2%);mix-blend-mode:multiply;opacity:0.5}
+  
+}
 </style>
 </head>
 <body>
-<div class="stage">
-  <div class="book-wrap" id="bookWrap">
-    <div class="pages" id="pages"></div>
 
-    <div class="controls">
-      <div class="group">
-        <button class="btn" id="prevBtn">◀ Prev</button>
-        <button class="btn" id="homeBtn">Cover</button>
-      </div>
-      <div class="page-ind" id="pageInfo">Page <strong id="pageNum">1</strong> / <strong id="pageTotal">12</strong></div>
-      <div class="group">
-        <button class="btn" id="indexBtn">Index</button>
-        <button class="btn primary" id="nextBtn">Next ▶</button>
-      </div>
-    </div>
+<header>💖 Nandini’s Diary 💖</header>
 
-  </div>
+<div class="container">
+  <div class="chapter-btn" data-chapter="opening">The Opening Scene</div>
+  <div class="chapter-btn" data-chapter="magic">Her Everyday Magic</div>
+  <div class="chapter-btn" data-chapter="heart">Her Heart</div>
+  <div class="chapter-btn" data-chapter="strengths">Her Strengths</div>
+  <div class="chapter-btn" data-chapter="chaos">Her Chaos</div>
+  <div class="chapter-btn" data-chapter="memories">Shared Memories</div>
+  <div class="chapter-btn" data-chapter="learnings">Learnings From Her</div>
+  <div class="chapter-btn" data-chapter="contrast">The Contrast</div>
+  <div class="chapter-btn" data-chapter="gratitude">Gratitude</div>
+  <div class="chapter-btn" data-chapter="closing">Closing Line</div>
 </div>
 
-<!-- Index modal -->
-<div id="indexModal" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9999;background:#fff;padding:16px;border-radius:12px;box-shadow:0 30px 80px rgba(10,10,12,0.12);max-width:92%;width:520px">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-    <strong style="font-size:18px;color:var(--accent1)">Index</strong>
-    <button id="closeIndex" style="border:0;background:#fff;padding:6px 10px;border-radius:8px;cursor:pointer">✕</button>
+<div class="overlay" id="overlay">
+  <button class="close-btn" onclick="closePopup()">×</button>
+  <div class="popup" id="popup-content">
+    <!-- Content will appear here dynamically -->
   </div>
-  <div id="tocList" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px"></div>
 </div>
 
 <script>
-/* =========================
-   Content (no images) - includes cover, index, 10 chapters, closing
-   Each item becomes one sheet (double-sided feel). We'll make 12 pages:
-   0: front cover
-   1: index (right)
-   2..11: chapters (10)
-   12: back cover (optional, we'll do 12 total)
-   ========================= */
-
-const content = [
-  // 0 Cover
-  {
-    id:'cover',
-    title:'The Story of My Bestie — Nandini',
-    left: 'For Nandini',
-    rightTitle:'A Gift Notebook',
-    rightText:'A little notebook of chaos, memories & love. Open and flip to feel the story.',
-    cover:true
+const chapters = {
+  opening: {
+    title: "The Opening Scene",
+    text: "So ye hain Nandini Barnwal, apni ghar ki badi bitiya 👑 — the second mom of the house. Very hardworking, thodi aalsi 😴 aur bahot saari foodie 🍕 [aaunga toh saath mein khaayenge] 😋 So mai batata hu how I met her… kaise mila ye toh ni yaad hai 🤔 but maine first time notice kiya tha jab jhagd hua tha ig Dev ke saath first benches pr 😅 aur hamne Priya mam ko complaint kar diya tha 😂 [ik bachcho waali harkat thi but thik hai na].Uske baad pata nai chala kab ham acche dost bane, uske baad best friends, fir bestest friends 💖 [meri taraf se, ab kya pata tu maanti hai ya nai 😜].Starting se hi tera character thoda dominating laga 😏 — hona bhi chahiye ghar ki badi beti jo hai 👩‍👧.Aur fir ek scene yaad dilata hu opening scene ka — so ye baat hai maine jab pro kiya tha, uske baad mai alag baith gaya tha sabse, tu aakr baith gayi thi mere baaju mai 💭.Tab bhi nonchalant behave kar raha tha — idk why, but uske alawa kuch karta toh mai awkward ho jata 😅.But this was the real opening scene — tab you comforted me by saying, “Tu accha ladka hai,” 😌 bcuz mai Sapna ko taad nai raha tha ya use uncomfortable kar raha tha.I was trying to act normal, which really comforted me ❤️. Mujhe yaad hai light feel ho raha tha 🌤️. So this was the start... now next chapter 📖✨"
   },
-
-  // 1 Index
-  {
-    id:'index',
-    title:'Index',
-    left: 'Index',
-    rightTitle:'Chapters',
-    rightText:
-`1. The Opening Scene
-2. Her Everyday Magic
-3. Her Heart
-4. Her Strengths
-5. Her Chaos
-6. Shared Memories
-7. Learnings From Her
-8. The Contrast
-9. Gratitude
-10. Closing Line`,
-    meta:'Index'
+  magic: {
+    title: "Her Everyday Magic",
+    text: "So the story continues… she is really magical ✨ kyuki pata hi ni chalta kab mood kharaab se thik ho jaata hai 😄. Aur bataau toh you really have a positive aura or presence 🌈 cuz it feels nice around you — ya tujhse baat karke 🫶. Aur bhai ye larki itna kaam karti hai 💪 — kisiki tabbiyat khraab ho toh akele sambhalti hai. Haan, behen help kar deti hai fir bhi, u do a lot 👏. Aur gaon mein itna kaam kiya ye sun kar toh mere hosh udd gaye 😲. Itni strong bh hai 💥. Aur u r tooooooooooooooooooo gooooooooooooooooooddd 😍 — aisi hi rehna aur apna jaadu mujh jaise doston par chidakte rehna 🪄💫"
   },
-
-  // 2 The Opening Scene
-  {
-    id:'opening',
-    title:'The Opening Scene',
-    left: 'Opening',
-    rightTitle:'The Opening Scene',
-    rightText:`So ye hain Nandini Barnwal apni ghar ki badi bitiya, the second mom of house very hardworking thodi aalsi aur bahot saari foodie [ aaunga toh saath mein khaayenge ] so mai batata hu how i met her so kaise mila ye toh ni yaad hai but maine first time notice kiya tha jab jhagd hua tah ig dev ke saath first benches pr aur hamne Priya mam ko complaint kardiya tha [ ik baccho waali harkat thi but thik hai na ] uske baad pata nai chala kab ham acche dost bane uske baad bestfriends fir bestest friends [ meri taraf se ab kya pata tu maanti hai yaa nai ] so starting se hi tera character thoda dominating laga hona bhi chiye ghar ki badi beti jo hai aur fir ek scene yaad dilata hu opening scene  ka so ye baat hai maine jab pro kiya tha uske baad mai alag baith gya tha sabse tu aakr baith gyi thi mere baaju mai tab bhi non chalant behave kar raha tha idk why but uske alawa kuch karta toh mai awkward hojata but this was a real opening scene tab you comforted me by sying tu accha larka hai bcuz mai sapna ko taad nai raha tha yaa use uncomfortable kar raha tha i was trying to act normal which really comforted me mujhe yaad hai light feel ho raha tha so this was start now next chapter.`,
+  heart: {
+    title: "Her Heart",
+    text: "So yupp, she is soft-hearted 💗 who tries to be cold-hearted 😎 when someone tries to hurt her, to show how strong she is 💪. But she is very soft-hearted — like she could cry over small things 😢 if she cares for it. Par agar ek baar thaan liya toh she is a baddie girl too 😏🔥 — kuch bhi kar lo, kuch farq nahi padega use, aur uska jawaab aur khatarnak tareeke se milega ⚔️. So beware 😬 warna ye bas dikhti sweet nd swami type ki 🧘‍♀️ — jab tak tu acchese ho, warna ye hai bahot darawni type ka 😈, sar war phod degi 💥😂. But her heart is cute, soft, and veryyy kind 💕✨"
   },
-
-  // 3 Her Everyday Magic
-  {
-    id:'everyday',
-    title:'Her Everyday Magic',
-    left: 'Everyday Magic',
-    rightTitle:'Her Everyday Magic',
-    rightText:`so the story continues she is really magical kyuki pata hi ni chalta kab mood khraab se thik hojata hai aur btaau toh you really have a positive aura or presence cuz it feels nie around you yaa tujhse baat karke aur bhai ye larki itna kaam karti hai kisiki tabbiyat khraab toh akele sambhalti hai haa behen help kardeti hai fir bhi u do a lot aur gaon mein itna kaam kiya ye sun kr toh mere hosh udd gya itni strong bh hai aur u r tooooooooooooooooooo gooooooooooooooooooddd aisi hi rehna aur apna jaado mujh jaise doston par chidakte rehna`,
+  strengths: {
+    title: "Her Strengths",
+    text: "She is a good listener 👂 and a communicator 💬, extrovert hai 😁 — agar vibe match ho gayi toh ghanto tak baat kar sakte ho 🕐. Aur understanding bhi hai yrr 💞, stml mujhse toh bahot kam hai 😂. Kaafi acchi hai kaamo mein — khaana bana leti hai 🍳, gifts bana leti hai 🎁, ghar ke saare kaam 🧹, padhai bhi kar leti hai 📚 — bas numerical mein thodi ladkhada jaati hai 😅. Cute dikhti hai 🥰, kaafi fictional books padhti hai 📖 — so romantic 💕, and gr8 ideas to impress & attract hai iske paas 😎. Ab aur kya kya padhti hai Wattpad, woh ni pata mujhe 😂, woh toh yahi jaane 😜. But overall ye Diwali patakha combo 🎇 — sachchi! Lekin ye ab ladke par depend karta hai — agar accha hua toh lottery lagegi 💫, aur bura hua toh bhi L hi lagenge 😬😂. 🌪️ Her Chaos"
   },
-
-  // 4 Her Heart
-  {
-    id:'heart',
-    title:'Her Heart',
-    left: 'Her Heart',
-    rightTitle:'Her Heart',
-    rightText:`so yupp she is soft hearted who tries to be cold hearted when someone try to hurt her to show hwo strong she is but she is very soft hearted like she could cry oversmall things if she cares for it but agar ek baar than liya toh she is a baddie girl too kuch bhi krlo kuch fark ni padega use aur uska jawaab aur khtarnaak tareeke se milega so beware warna ye bas dikhti sweet nd swami type ki jab tak tu acchese  ho warna ye hai bahot darawni type ka sar war phod degi but her heart is cute, soft, and veryyy kind..`,
+  chaos: {
+    title: "Her Chaos",
+    text: "So she is full of chaos 🤪. When she is happy, she will annoy you 😈, tease you 😝, punch you 👊, baal kheech sakti hai 😭, maar sakti hai 😅, dance karegi 💃, gaane gaayegi 🎤 — so agar ye sab kar sakte ho, tab toh Ganga nahaa lena 🛁, you will love to be involved 😂. Aur agar angry chaos ke baare mein kahu toh fir chup chap uski haan mein haan mila lena 😬, aur jo bole kar dena 😇 — warna be ready for World War 3 💣💥, or maybe a Universe War — more terrifying than Avengers Endgame war ⚔️😱. So pange na lena 😅 — zyaada better hota hai. Bas mujhe maaf kar deti hai ye 😌, jiske liye I’m really thankful 🙏 kyuki mai hoon nahi na waha, warna mujhe manana bahot acche se aata hai 😉 hehehehehe 😜😂"
   },
-
-  // 5 Her Strengths
-  {
-    id:'strengths',
-    title:'Her Strengths',
-    left: 'Strengths',
-    rightTitle:'Her Strengths',
-    rightText:`she is a good listener and a communicator, extrovert hai agar vibe match hogyi toh ghanto tak baat kar sakte ho aur understanding bhi hai yrr stml mujhse toh bahot kam hai aur kaafi acchi hai kaamo mein khaana bana leti hai, gifts banaleti hai, ghar ke saare kaam, padhai bhi krleti hai bas numerical mein thodi ladkhada jaati hai, cute dikhti hai, kaafi fictional books padhti hai so romantic, and gr8 ideas to impress,attract hai iske paas ab aur kya kya padhti hai wattpad woh ni pta meko woh toh yahi jaane. but overall is diwaali patakha combo sacchi lekin ye ab larke par depend karta hai woh accha hua toh lottery lagegi aur bur hua tab bhi L hi lagenge`,
+  memories: {
+    title: "Shared Memories",
+    text: "So shared memories toh bahot saare hain 💭 — so mai mera favourite batata hu 🤔. Ummm… the best memory is jab ham ghumne gaye the mall 🏬 and tri mandir 🛕 — my first ghumna! Mujhe pata nahi tha mai kaise milunga 😅 kyuki tere paas phone nahi tha 📵 aur tu alone thi — milegi ya nai? But accha hua mil gayi 😌. Mai thoda late tha 😬 but mil gaye the 😄 and unfortunately hamara twining jaisa bhi lag raha tha 😂. Aur hamne lagatar 3 bus miss kari thi 😭🤣 — aur fir finally rickshaw le li thi 🚕. Ham mall pahuche, mall ghoome 🛍️, aur haa hamne kuch khaya nahi tha 🍔. Maine pucha tha but you denied, bola bahar jaakr khaayenge 😋. Fir achanak se plan bana — ab tu traditional pehen kar aayi hai 👗 toh mandir bhi jaayenge hi 🙏. So ham bahar nikal ke mandir ke liye rickshaw liye, pahuche aur ham mandir gaye 💫. Fir jaha meri ek pehchaan ki ladki already thi 😅 if u remember 😜, but ham mandir mein ghus gaye which was worth it — mandir bhi accha tha aur view bhi 🌄. Fir ham wapas aa rahe the toh hame bus bhi mil gayi 🚌 turant — and we actually reached on time ⏰, thoda hi late hua tha. It was a good quality day with you 💖🌸"
   },
-
-  // 6 Her Chaos
-  {
-    id:'chaos',
-    title:'Her Chaos',
-    left: 'Chaos',
-    rightTitle:'Her Chaos',
-    rightText:`so she is full of chaos when she is happy she will annoy you, tease you, punch you, baal kheech sakti hai, maar sakti hia, dance karegi, gaane gaayegi so agar ye sab karsakte ho tab toh ganga nahaa lena you will love to be involved aur agr angry chaos ke baare mein kahu toh fir chup chap uski haan mein haam milaa lena aur jo bole kardena warna be ready for a world war 3 or may be universe war more terrifyning that evengers end game war so pange naa lena zyaada better hota hai bas mujhe maaf kardeti hai ye jiske liye i m really thankyou kyuki mai hu nai na waha warna mujhe manana bahot acche se aata hai hehehehehe .`,
+    learnings: {
+    title: "Learnings From Her",
+    text: "Learnings from you is to be bindaas 😎, to learn, to understand, to give importance, to handle tough situations 💪, to do hard work 🧠, to manage lots of things at a time 🕒 — and a lot more. During classes bhi kaafi hardworking thi 💼, abhi bhi hai — bas padhai ke liye nahi 😜 but u can do that too. Caring hai 🤍, and u consider everyone — judge karke khatam nahi karti 🫶. Suntii hai 👂, that’s a good quality 💫. And learning from you — seekha toh bahot kuch hu 💭, kyuki you are a great personality ✨. I pray u achieve wonders in life 🌠 — from my whole heart ❤️."
   },
-
-  // 7 Shared Memories
-  {
-    id:'memories',
-    title:'Shared Memories',
-    left: 'Memories',
-    rightTitle:'Shared Memories',
-    rightText:`so shared memories toh bahot saare hai so mai mera favourite batata hu ummm...... so the best memory is jab ham ghumne gaye the mall and tri madir my first ghumna like mujhe pata nai tha mai kaise milung akyuki tere pass phone nai tha aur u were alone milegi yaa nai but accha hua mil gayi mai thoda late tha but milgaye the and unfortunately hamar twining jaisa bhi lag raha tha aur hamne lagatar 3 bus miss kari thi hahahahaha aur fir hane finally rickshaw Karli thi lekin ham mall pahuche the mall ghume and haa hamne kuch khaya nai tha maine pucha tha but you denied bola bahar jaakr khaayenge fir achanak se plan bana ab tu traditional pehen kr aayi hai toh madir bhi jaayenge hi so ham bahar nikal ke mandir ke liey rickshaw liye pahuche and ham mandir gaye fir jaha meri ek pehchan ki larki already thi if u remember but ham mandir mein ghus gaye which was worthit going mandir bhi accha tah aur view bhi and fir ham waapas aarahe the toh hame bus bhi milgayi turant and we actually reach on time i guess thoda hi late hua tha it was a good quality day with you`,
+  contrast: {
+    title: "The Contrast",
+    text: "So contrast ki baat karu toh — mujhse stml hai tujhe nahi 😝. Mujhe maths ke numericals aate hai ➗, tujhe nahi 😅. Tu understands people more accurately 🧠, mujhe nahi 😬. Tere paas emotional intelligence hai 💞, aur mere paas math intelligence 😂. But overall, we are the best combo 🤝 — jo mere paas nahi hai woh tere paas hai, aur jo tere paas nahi hai woh mere paas 😌. Ham bane hi dost banne ke liye hai yrr 💫 — we’re made for being bro-sis-besties, womannnnnn 🫶🔥"
   },
-
-  // 8 Learnings
-  {
-    id:'learnings',
-    title:'Learnings From Her',
-    left: 'Learnings',
-    rightTitle:'Learnings From Her',
-    rightText:`learnings from you is to be bindaas to learn to understand to give importance how to handle tough situations to do hardwork to manage lots of thinga at a time and alot like during classe sbhi toh kaafi hardworking thi abhi bhi hai bas padhai ke liye ni but u can do that too caring hai and u consider everyone judge karke khtm ni krti suntii hai thats a good quality and learning from you seekha toh bahot kuch hu kyu ki you are a great personality I pray u achieve wonders in life from whole heartedly.`,
+  gratitude: {
+    title: "Gratitude",
+    text: "Bahoooooooooooooooot saaaraaaaaaaaaaa thannkkkkkkkkkkkkkk youuuuuuuuuuuuuu Nanduuuuuuuuuuuuuuuuuuuu 💕💕💕 You are theeeeeeeeeeee superrrrrrrrr duperrrrrr bestttttttttt 😍🙌. Thanks for handling me 😅 and comforting me during my tough timessssss 🤍✨"
   },
-
-  // 9 The Contrast
-  {
-    id:'contrast',
-    title:'The Contrast',
-    left: 'Contrast',
-    rightTitle:'The Contrast',
-    rightText:`So contrast ki baat karu toh mujhse stml hai tujhe nai mujhe maths ke numericals aate hai tujhe nai you understands people more acuratly i dont tere paas emotional intelligence hai aur mere paas math intelligence but overeall we are best combo jo mere paas nai hai woh tere paas hai aur jo tere paas nai hai woh mere paas ham bane hi dost banne ke liye hai yrr were are made fore being bro-sis -besties womannnnnn.`,
-  },
-
-  // 10 Gratitude
-  {
-    id:'gratitude',
-    title:'Gratitude',
-    left: 'Gratitude',
-    rightTitle:'Gratitude',
-    rightText:`bahoooooooooooooooot saaaraaaaaaaaaaa thannkkkkkkkkkkkkkk youuuuuuuuuuuuuu nanduuuuuuuuuuuuuuuuuuuu you are theeeeeeeeeeee superrrrrrrrr duperrrrrr besttttttt tahnks for hmndling me and comforting me during my tough timessssss`,
-  },
-
-  // 11 Closing
-  {
-    id:'closing',
-    title:'Closing Line',
-    left: 'Closing',
-    rightTitle:'Closing Line',
-    rightText:`I pray to god ki duniyaa idhar ki udhar hojaaye bas isey yahi rakhan hahahahaah warna fir dekhlena accha ni hoga apake liye ye jo meri behen hai na chodegi nai aapko hahahah`,
-    back:true
+  closing: {
+    title: "Closing Line",
+    text: "I pray to God 🙏 ki duniya idhar ki udhar ho jaaye, bas isey yahi rakhe 😭😂 hahahahaha — warna fir dekh lena, accha nahi hoga aapke liye 😏. Ye jo meri behen hai na 🤜💥, chhodega nahi aapko hahahahah 🤣💞"
   }
-];
+};
 
-/* Build sheets dynamically */
-const pagesEl = document.getElementById('pages');
-content.forEach((c, i) => {
-  const sheet = document.createElement('article');
-  sheet.className = 'sheet' + (c.cover ? ' cover' : '') + (c.back ? ' back' : '');
-  sheet.dataset.index = i;
+const overlay = document.getElementById('overlay');
+const popupContent = document.getElementById('popup-content');
 
-  // left and right columns
-  const left = document.createElement('div');
-  left.className = 'left';
-  left.innerHTML = `<div class="label" style="background:linear-gradient(90deg, ${i%3===0? 'var(--accent1)' : i%3===1? 'var(--accent2)' : 'var(--accent3)'} , rgba(0,0,0,0.06));">${c.left || ''}</div>
-                    <div class="note">${(c.left && c.left.length>0) ? ' ' : ''}</div>`;
-
-  const right = document.createElement('div');
-  right.className = 'right';
-  const title = c.rightTitle ? `<h2>${c.rightTitle}</h2>` : `<h2>${c.title || ''}</h2>`;
-  const meta = c.meta ? `<div class="meta">${c.meta}</div>` : '';
-  right.innerHTML = `${title}${c.rightSub?'<h3>'+c.rightSub+'</h3>':''}<p>${(c.rightText || '')}</p>${meta}`;
-
-  sheet.appendChild(left);
-  sheet.appendChild(right);
-  pagesEl.appendChild(sheet);
-});
-
-/* Setup stacking z-index so top page is last */
-const sheets = Array.from(document.querySelectorAll('.sheet'));
-const total = sheets.length;
-sheets.forEach((s, i) => s.style.zIndex = total - i);
-
-/* Flip logic */
-let current = 0;
-function showPages(index){
-  // index is the sheet that is the "open" left-most not-yet-flipped? We'll treat index as current RIGHT page index
-  // We'll flip all sheets with data-index <= index-1
-  sheets.forEach((s) => {
-    const num = Number(s.dataset.index);
-    if(num <= index - 1){
-      s.classList.add('flipped');
-    } else {
-      s.classList.remove('flipped');
-    }
+document.querySelectorAll('.chapter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const data = chapters[btn.dataset.chapter];
+    popupContent.innerHTML = `<h2>${data.title}</h2><p>${data.text}</p>`;
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
   });
-  document.getElementById('pageNum').textContent = (index + 1) <= total ? (index + 1) : total;
-}
-
-/* Controls */
-document.getElementById('nextBtn').addEventListener('click', () => {
-  if(current < total - 1){ current++; showPages(current); }
-});
-document.getElementById('prevBtn').addEventListener('click', () => {
-  if(current > 0){ current--; showPages(current); }
-});
-document.getElementById('homeBtn').addEventListener('click', () => { current = 0; showPages(current); });
-
-/* Index modal */
-const tocList = document.getElementById('tocList');
-content.forEach((c,i) => {
-  const b = document.createElement('button');
-  b.textContent = `${i}. ${c.title}`;
-  b.style.border = '1px solid rgba(0,0,0,0.04)';
-  b.style.background = '#fff';
-  b.style.padding = '8px';
-  b.style.borderRadius = '8px';
-  b.style.cursor = 'pointer';
-  b.addEventListener('click', ()=> {
-    document.getElementById('indexModal').style.display = 'none';
-    current = i;
-    showPages(current);
-  });
-  tocList.appendChild(b);
-});
-document.getElementById('indexBtn').addEventListener('click', ()=> document.getElementById('indexModal').style.display = 'block');
-document.getElementById('closeIndex').addEventListener('click', ()=> document.getElementById('indexModal').style.display = 'none');
-
-/* Keyboard navigation */
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'ArrowRight') document.getElementById('nextBtn').click();
-  if(e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
 });
 
-/* Swipe for mobile */
-let startX = null;
-document.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
-document.addEventListener('touchend', e => {
-  if(startX === null) return;
-  const dx = e.changedTouches[0].clientX - startX;
-  if(dx < -40) document.getElementById('nextBtn').click();
-  if(dx > 40) document.getElementById('prevBtn').click();
-  startX = null;
-});
-
-/* On load set page total and initial view */
-document.getElementById('pageTotal').textContent = total;
-showPages(current);
-
-/* Make it mobile-friendly: on narrow screens, show one sheet centered and scale */
-function adaptForScreen(){
-  const w = window.innerWidth;
-  if(w <= 700){
-    // We want single page visible; center sheets and scale slightly
-    sheets.forEach((s) => {
-      s.style.left = '0';
-      s.style.right = '0';
-      s.style.margin = '0 auto';
-      s.style.width = '94%';
-      s.style.transformOrigin = 'center center';
-    });
-  } else {
-    // spread full width
-    sheets.forEach((s) => {
-      s.style.left = '0';
-      s.style.right = '0';
-      s.style.width = '100%';
-      s.style.transformOrigin = 'left center';
-    });
-  }
-}
-window.addEventListener('resize', adaptForScreen);
-adaptForScreen();
-
-/* Accessibility: announce page change (simple) */
-function announce(){
-  const title = content[current] && content[current].title ? content[current].title : `Page ${current+1}`;
-  // optionally use ARIA live region - minimal here:
-  console.log('Now showing:', title);
+function closePopup() {
+  overlay.style.display = 'none';
+  document.body.style.overflow = 'auto';
 }
 </script>
+
 </body>
 </html>
